@@ -1,35 +1,44 @@
 import { TouchableOpacity, View,Text,StyleSheet,Image } from "react-native"
 
-interface Props{
-    name:string;
-    onRemove: () => void;
-}  
-export function Product({name, onRemove}: Props){
-    return(
-        <View style= {styles.container}>
-            
-            <TouchableOpacity style = {styles.buttonCheck}>
-            <Image
-            source={require("../../assets/image/layerGreen.png")}
-                style={styles.layerGreen}
-                />
-            </TouchableOpacity>
-            <Text style = {styles.name}>{name}</Text>
+interface Props {
+  id: string;
+  name: string;
+  completed: boolean;
+  onRemove: () => void;
+  onCheck: () => void;
+}
 
-            <TouchableOpacity style = {styles.button} onPress = {onRemove}>
-                <Image
-                source={require("../../assets/image/layerDelete.png")}
-                style={styles.layerDelete}
-                />
-            </TouchableOpacity>
-        </View>
-    )
+export function Product({ name, completed, onRemove, onCheck }: Props) {
+  return (
+    <View style={styles.container}>
+      <TouchableOpacity style={styles.buttonCheck} onPress={onCheck}>
+        <Image
+          source={
+            completed
+              ? require("../../assets/image/layerPurple.png") // novo ícone roxo
+              : require("../../assets/image/layerGreen.png")
+          }
+          style={styles.layerGreen}
+        />
+      </TouchableOpacity>
+
+      <Text style={[styles.name, completed && { textDecorationLine: "line-through", color: "#808080" }]}>
+        {name}
+      </Text>
+
+      <TouchableOpacity style={styles.button} onPress={onRemove}>
+        <Image
+          source={require("../../assets/image/layerDelete.png")}
+          style={styles.layerDelete}
+        />
+      </TouchableOpacity>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
     container: {
        width: "100%",
-       backgroundColor: '#ffffff',
        flexDirection:  'row',
        alignItems: "center",
        borderRadius:8,
@@ -37,7 +46,6 @@ const styles = StyleSheet.create({
        marginTop:8,
        borderWidth:1,
        borderColor:"#808080",
-       
     },
     name:{
         flex: 1,
@@ -47,7 +55,6 @@ const styles = StyleSheet.create({
         marginRight: 16,
         fontWeight:400,
     },
-    
      buttonText:{
         fontSize: 24,
         color: "white",
