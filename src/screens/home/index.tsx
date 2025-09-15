@@ -13,7 +13,6 @@ export function Home() {
   const [products, setProducts] = useState<ProductType[]>([]);
   const [finishedProducts, setFinishedProducts] = useState<ProductType[]>([]);
   const [productName, setProductName] = useState("");
-  const [inputFocused, setInputFocused] = useState(false);
 
   function handleAddProduct() {
     if (!productName.trim()) return;
@@ -38,27 +37,35 @@ export function Home() {
     setProductName("");
   }
 
-  function handleProductCheck(id: string) {
+  function handleProductToggle(id: string) {
+  
     const product = products.find((p) => p.id === id);
-    if (!product) return;
-
-    const updated = { ...product, completed: true };
-
-    setProducts((prev) => prev.filter((p) => p.id !== id));
-    setFinishedProducts((prev) => [...prev, updated]);
+    if (product) {
+      const updated = { ...product, completed: true };
+      setProducts((prev) => prev.filter((p) => p.id !== id));
+      setFinishedProducts((prev) => [...prev, updated]);
+      return;
+    }
+    
+    const finished = finishedProducts.find((p) => p.id === id);
+    if (finished) {
+      const updated = { ...finished, completed: false };
+      setFinishedProducts((prev) => prev.filter((p) => p.id !== id));
+      setProducts((prev) => [...prev, updated]);
+    }
   }
 
   function handleProductRemove(id: string) {
     Alert.alert("Remover", `Deseja remover o produto?`, [
       {
-        text: "sim",
+        text: "Sim",
         onPress: () => {
           setProducts((prev) => prev.filter((p) => p.id !== id));
           setFinishedProducts((prev) => prev.filter((p) => p.id !== id));
         },
       },
       {
-        text: "não",
+        text: "Não",
         style: "cancel",
       },
     ]);
@@ -73,27 +80,18 @@ export function Home() {
       </View>
 
       <View style={styles.bottom}>
-        <View
-            style={{
-                flexDirection: "row",
-                alignItems: "center",
-                borderWidth: 0.5,
-                borderRadius: 6,
-                paddingHorizontal: 8,
-                backgroundColor: "#F2F2F2",
-            }}
-            >
-            {/* Prefixo fixo */}
-            <Text style={{ color: "#808080" }}>Descrição do produto | </Text>
-
-            {/* Input real */}
-            <TextInput
-                style={{ flex: 1, color: "#000", paddingVertical: 12 }}
-                value={productName}
-                onChangeText={setProductName}
-                placeholder="Digite aqui..."
-                placeholderTextColor="#ccc"
-            />
+      
+        <View style={styles.form}>
+          <TextInput
+            style={styles.input}
+            placeholder="Adicione um novo produto"
+            placeholderTextColor="#808080"
+            onChangeText={setProductName}
+            value={productName}
+          />
+          <TouchableOpacity style={styles.button} onPress={handleAddProduct}>
+            <Image source={require("../../../assets/image/plus.png")} />
+          </TouchableOpacity>
         </View>
 
         <View style={styles.indicators}>
@@ -107,7 +105,6 @@ export function Home() {
           </View>
         </View>
 
-      
         <FlatList
           showsVerticalScrollIndicator={false}
           data={allProducts}
@@ -118,9 +115,7 @@ export function Home() {
               name={item.name}
               completed={item.completed}
               onRemove={() => handleProductRemove(item.id)}
-              onCheck={() =>
-                item.completed ? {} : handleProductCheck(item.id)
-              }
+              onCheck={() => handleProductToggle(item.id)}
             />
           )}
           contentContainerStyle={{ paddingBottom: 20 }}
